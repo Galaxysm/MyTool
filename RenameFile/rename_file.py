@@ -134,12 +134,12 @@ def remove_empty_folders(folder_path):
 
 def main():
     # 直接在这里定义参数
-    source_folder = r"F:\2025\Check\test"  # 源文件夹路径
-    target_folder = r"F:\2025\Check\test1"  # 目标文件夹路径
-    prefix = "document"  # 文件名的前缀（重命名时使用）
+    source_folder = r"E:\02_ACG\映画\4K原版"  # 源文件夹路径
+    target_folder = r"E:\02_ACG\映画\4K原版"  # 目标文件夹路径
+    prefix = "铃原爱蜜莉"  # 文件名的前缀（重命名时使用）
     start_num = 1  # 起始编号（重命名时使用）
     extension = None  # 指定扩展名，None表示所有文件
-    rename_files = True  # 是否重命名文件
+    rename_files = False  # 是否重命名文件
 
     print("开始批量整理文件...")
     print(f"源文件夹: {source_folder}")
