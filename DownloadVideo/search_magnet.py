@@ -127,8 +127,27 @@ def extract_magnet_links_from_excel():
                     magnet_link = magnet_links[0]
                     print(f"找到magnet链接: {magnet_link}")
 
+                    # 检查是否有重复的磁力链接
+                    is_duplicate = False
+                    for check_row in range(2, row_num):
+                        existing_link = sheet1[f'B{check_row}'].value
+                        if existing_link and existing_link == magnet_link:
+                            is_duplicate = True
+                            print(f"发现重复的磁力链接，位于B{check_row}")
+                            break
+
                     # 9. 将magnet链接写入Sheet1的对应行
                     sheet1[f'B{row_num}'] = magnet_link
+
+                    # 如果是重复链接，在D列标记"重复"
+                    if is_duplicate:
+                        sheet1[f'D{row_num}'] = "重复"
+                        print(f"重复磁力链接，已在D{row_num}单元格标记")
+                    else:
+                        # 确保D列没有标记（如果是新处理的行）
+                        if sheet1[f'D{row_num}'].value == "重复":
+                            sheet1[f'D{row_num}'] = None
+
                     print(f"magnet链接已写入Sheet1的B{row_num}单元格")
                     processed_count += 1
 
@@ -147,6 +166,20 @@ def extract_magnet_links_from_excel():
                 print(f"处理URL {url} 时发生错误: {e}")
                 # 继续处理下一个URL
                 continue
+
+        # 处理完成后，再次检查所有B列值，确保标记所有重复项
+        print("\n处理完成，开始全面检查重复项...")
+        magnet_values = {}
+        for row in range(2, sheet1.max_row + 1):
+            magnet_value = sheet1[f'B{row}'].value
+            if magnet_value and str(magnet_value).strip() != '':
+                if magnet_value in magnet_values:
+                    # 标记当前行和之前的所有相同行为重复
+                    sheet1[f'D{row}'] = "重复"
+                    sheet1[f'D{magnet_values[magnet_value]}'] = "重复"
+                    print(f"标记重复: 行 {magnet_values[magnet_value]} 和 行 {row}")
+                else:
+                    magnet_values[magnet_value] = row
 
         # 最终保存Excel文件
         wb.save(excel_file)
