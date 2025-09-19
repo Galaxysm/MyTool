@@ -1,0 +1,2 @@
+1.Excel序号公式：=IF(B2="","",ROW()-ROW($A$1))
+2.Excel分类公式：=@Sheet2!C:C
