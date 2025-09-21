@@ -83,7 +83,7 @@ class MagnetLinkExtractor:
         return False
 
     def find_thread_elements(self):
-        """在页面中寻找帖子链接"""
+        """在页面中寻找帖子链接和标题"""
         try:
             # 等待页面主体加载完成
             WebDriverWait(self.driver, 15).until(
@@ -100,7 +100,7 @@ class MagnetLinkExtractor:
                 "//*[contains(@id, 'threadlisttableid')]//a[contains(@class, 's xst')]"
             ]
 
-            href_list = []
+            thread_data = []  # 存储链接和标题的元组列表
             found_elements = False
 
             for selector in selectors:
@@ -118,15 +118,16 @@ class MagnetLinkExtractor:
                         for link in links:
                             try:
                                 href = link.get_attribute('href')
-                                if href and href not in href_list:
-                                    href_list.append(href)
-                                    print(f"找到链接: {href}")
+                                text = link.text
+                                if href and (href, text) not in thread_data:
+                                    thread_data.append((href, text))
+                                    print(f"找到链接: {href}, 标题: {text}")
                             except StaleElementReferenceException:
                                 print("元素已过期，跳过")
                                 continue
 
                         # 如果找到链接，不再尝试其他选择器
-                        if href_list:
+                        if thread_data:
                             break
 
                 except (TimeoutException, NoSuchElementException):
@@ -140,19 +141,20 @@ class MagnetLinkExtractor:
                 for link in all_links:
                     try:
                         href = link.get_attribute('href')
-                        if href and 'thread' in href and 'forum' in href and href not in href_list:
-                            href_list.append(href)
+                        text = link.text
+                        if href and 'thread' in href and 'forum' in href and (href, text) not in thread_data:
+                            thread_data.append((href, text))
                     except StaleElementReferenceException:
                         continue
 
-            return href_list
+            return thread_data
 
         except Exception as e:
             print(f"查找元素时出错: {e}")
             return []
 
     def process_all_links(self, main_url):
-        """处理所有链接并提取超链接"""
+        """处理所有链接并提取超链接和标题"""
         try:
             # 访问主页面
             print(f"正在访问主页面: {main_url}")
@@ -177,7 +179,7 @@ class MagnetLinkExtractor:
                 print("未找到超链接")
                 return []
 
-            # 提取所有链接
+            # 提取所有链接和标题
             print(f"共找到 {len(elements)} 个链接需要处理")
             return elements
 
@@ -213,20 +215,20 @@ class MagnetLinkExtractor:
 
         return existing_links
 
-    def save_to_excel(self, href_links, excel_file, sheet_name):
-        """将超链接保存到Excel，如果B列已有数据，则在下方追加，并避免重复"""
+    def save_to_excel(self, thread_data, excel_file, sheet_name):
+        """将超链接和标题保存到Excel，如果B列已有数据，则在下方追加，并避免重复"""
         try:
             # 获取已存在的链接
             existing_links = self.get_existing_links(excel_file, sheet_name)
 
             # 过滤掉已存在的链接
-            new_links = [link for link in href_links if link not in existing_links]
+            new_data = [(link, title) for link, title in thread_data if link not in existing_links]
 
-            if not new_links:
+            if not new_data:
                 print("没有新的链接需要添加")
                 return
 
-            print(f"过滤后，有 {len(new_links)} 个新链接需要保存")
+            print(f"过滤后，有 {len(new_data)} 个新链接需要保存")
 
             # 检查Excel文件是否存在
             if os.path.exists(excel_file):
@@ -247,15 +249,16 @@ class MagnetLinkExtractor:
                 if sheet[f'B{row}'].value is not None:
                     last_row = row + 1
 
-            # 写入新链接
-            for i, link in enumerate(new_links, start=last_row):
+            # 写入新链接和标题
+            for i, (link, title) in enumerate(new_data, start=last_row):
                 sheet[f'B{i}'] = link
-                sheet[f'C{i}'] = datetime.now()
+                sheet[f'C{i}'] = title  # 将标题写入C列
+                sheet[f'D{i}'] = datetime.now()  # 将时间写入D列
 
             # 保存文件
             wb.save(excel_file)
             print(
-                f"成功保存 {len(new_links)} 个新超链接到 {excel_file} 的 {sheet_name} 工作表B列，从第 {last_row} 行开始")
+                f"成功保存 {len(new_data)} 个新超链接到 {excel_file} 的 {sheet_name} 工作表，从第 {last_row} 行开始")
 
         except Exception as e:
             print(f"保存到Excel时出错: {e}")
@@ -284,18 +287,18 @@ def main():
         extractor = MagnetLinkExtractor()
 
         try:
-            # 提取超链接
-            href_links = extractor.process_all_links(target_url + str(page))
+            # 提取超链接和标题
+            thread_data = extractor.process_all_links(target_url + str(page))
 
-            if href_links:
-                print(f"第 {page} 页找到 {len(href_links)} 个超链接")
+            if thread_data:
+                print(f"第 {page} 页找到 {len(thread_data)} 个超链接")
                 # 保存到Excel
-                extractor.save_to_excel(href_links, output_excel, sheet_name)
+                extractor.save_to_excel(thread_data, output_excel, sheet_name)
             else:
                 print(f"第 {page} 页未找到任何超链接")
 
                 # 如果连续两页都没有找到链接，停止爬取
-                if page > 1 and not href_links:
+                if page > 1 and not thread_data:
                     print("连续两页没有找到链接，停止爬取")
                     break
 
