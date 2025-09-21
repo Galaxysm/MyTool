@@ -134,8 +134,8 @@ def remove_empty_folders(folder_path):
 
 def main():
     # 直接在这里定义参数
-    source_folder = r"E:\02_ACG\映画\4K原版"  # 源文件夹路径
-    target_folder = r"E:\02_ACG\映画\4K原版"  # 目标文件夹路径
+    source_folder = r"E:\02_ACG\映画\步兵系列"  # 源文件夹路径
+    target_folder = r"E:\02_ACG\映画\步兵系列"  # 目标文件夹路径
     prefix = "铃原爱蜜莉"  # 文件名的前缀（重命名时使用）
     start_num = 1  # 起始编号（重命名时使用）
     extension = None  # 指定扩展名，None表示所有文件

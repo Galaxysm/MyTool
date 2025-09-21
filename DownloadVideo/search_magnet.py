@@ -11,7 +11,7 @@ import re
 
 def extract_magnet_links_from_excel():
     # Excel文件路径
-    excel_file = 'BT.xlsx'  # 替换为你的Excel文件路径
+    excel_file = 'Resource/BT.xlsx'  # 替换为你的Excel文件路径
 
     try:
         # 1. 从Excel读取URL
@@ -66,7 +66,7 @@ def extract_magnet_links_from_excel():
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
 
         # 初始化Chrome浏览器
-        service = Service('chromedriver.exe')
+        service = Service('Resource/chromedriver.exe')
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # 处理每个URL
