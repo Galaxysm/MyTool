@@ -151,6 +151,7 @@ def add_magnet_to_quark(magnet_link):
 
 
 def main():
+    # 配置参数
     # 指定Excel文件路径
     # excel_file_path = input("请输入Excel文件路径: ").strip().strip('"')
     excel_file_path = 'Resource/BT.xlsx'

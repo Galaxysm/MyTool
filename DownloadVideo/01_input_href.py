@@ -272,11 +272,11 @@ class MagnetLinkExtractor:
 
 def main():
     # 配置参数
-    target_url = "https://309r.0i284.net/forum.php?mod=forumdisplay&fid=36&typeid=654&typeid=654&filter=typeid&page="
+    target_url = "https://309r.0i284.net/forum-151-{}.html"
     output_excel = "Resource/BT.xlsx"
     sheet_name = "Auto超链接"
     page = 1
-    max_pages = 10
+    max_pages = 78
 
     while page <= max_pages:
         print(f"\n{'=' * 50}")
@@ -288,7 +288,10 @@ def main():
 
         try:
             # 提取超链接和标题
-            thread_data = extractor.process_all_links(target_url + str(page))
+            #url = target_url + str(page)               # 拼接形式1
+            url = target_url.format(str(page))          # 拼接形式2
+
+            thread_data = extractor.process_all_links(url)
 
             if thread_data:
                 print(f"第 {page} 页找到 {len(thread_data)} 个超链接")

@@ -28,19 +28,19 @@ def extract_magnet_links_from_excel():
                 break
             row += 1
             # 安全限制，防止无限循环
-            if row > 1000:
+            if row > 10000:
                 print("警告：已达到最大行数限制")
                 start_row = row
                 break
 
         print(f"检测到Sheet1中B列最后一个有值的行是第 {start_row - 1} 行")
-        print(f"将从Sheet2的D{start_row}开始处理")
+        print(f"将从Sheet2的B{start_row}开始处理")
 
         # 3. 获取D列从起始行开始的所有URL，直到遇到空单元格
         urls = []
         row = start_row
         while True:
-            cell_value = sheet2[f'D{row}'].value
+            cell_value = sheet2[f'B{row}'].value
             if cell_value is None or str(cell_value).strip() == '':
                 break
             urls.append((row, cell_value))  # 保存行号和URL
@@ -51,7 +51,7 @@ def extract_magnet_links_from_excel():
                 break
 
         if not urls:
-            print(f"Sheet2的D列从D{start_row}开始没有找到URL")
+            print(f"Sheet2的B列从B{start_row}开始没有找到URL")
             return
 
         print(f"从Excel获取了 {len(urls)} 个待处理的URL")

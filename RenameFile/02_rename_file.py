@@ -188,6 +188,7 @@ def process_video_files(excel_path, folder_path):
 
 # 使用示例
 if __name__ == "__main__":
+    # 配置参数
     # 设置你的Excel文件路径和视频文件夹路径
     excel_file_path = r"../DownloadVideo/Resource/BT.xlsx"  # Excel文件路径
     video_folder_path = r"E:\02_ACG\映画\步兵系列"  # 视频文件夹路径
