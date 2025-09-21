@@ -4,7 +4,9 @@ from pathlib import Path
 
 
 def batch_organize_files(source_folder, target_folder=None, prefix="file", start_num=1,
-                         extension=None, rename_files=True):
+                         extension=None, rename_files=True,
+                         delete_small_files=False, min_size_gb=1,
+                         video_extensions=None):
     """
     批量整理指定文件夹中的所有文件（包括子文件夹），可选择是否重命名
 
@@ -15,7 +17,14 @@ def batch_organize_files(source_folder, target_folder=None, prefix="file", start
         start_num (int): 起始编号（仅在重命名时使用）
         extension (str): 指定文件扩展名(如".txt")，None表示所有文件
         rename_files (bool): 是否重命名文件，False时只移动不重命名
+        delete_small_files (bool): 是否删除小文件或非视频文件
+        min_size_gb (float): 最小文件大小(GB)，小于此值的文件将被删除
+        video_extensions (list): 视频文件扩展名列表，None表示使用默认列表
     """
+    # 设置默认视频扩展名
+    if video_extensions is None:
+        video_extensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.m4v', '.mpeg', '.mpg', '.rmvb', '.rm']
+
     # 设置目标文件夹
     if target_folder is None:
         target_folder = source_folder
@@ -47,32 +56,45 @@ def batch_organize_files(source_folder, target_folder=None, prefix="file", start
 
     print(f"找到 {len(all_files)} 个文件准备处理")
     print(f"重命名模式: {'开启' if rename_files else '关闭'}")
+    print(f"删除小文件模式: {'开启' if delete_small_files else '关闭'}")
+    if delete_small_files:
+        print(f"最小文件大小: {min_size_gb}GB")
     print("-" * 50)
 
     # 处理计数器
     processed_count = 0
+    skipped_count = 0
+    deleted_count = 0
     current_num = start_num
 
     # 处理每个文件
     for file_path in all_files:
         try:
             # 获取文件扩展名
-            file_ext = os.path.splitext(file_path)[1]
+            file_ext = os.path.splitext(file_path)[1].lower()
+
+            # 检查是否需要删除小文件或非视频文件
+            if delete_small_files:
+                file_size = os.path.getsize(file_path)
+                file_size_gb = file_size / (1024 * 1024 * 1024)  # 转换为GB
+
+                # 检查文件大小和扩展名
+                if file_size_gb < min_size_gb or file_ext not in video_extensions:
+                    os.remove(file_path)
+                    print(f"删除: '{os.path.basename(file_path)}' (大小: {file_size_gb:.2f}GB, 格式: {file_ext})")
+                    deleted_count += 1
+                    continue
 
             if rename_files:
                 # 重命名模式：编号在前，前缀在后，保留原扩展名
                 new_filename = f"{current_num:04d}_{prefix}{file_ext}"
                 new_file_path = os.path.join(target_folder, new_filename)
 
-                # 检查文件名冲突
-                counter = 1
-                original_new_file_path = new_file_path
-                while os.path.exists(new_file_path):
-                    # 冲突时在文件名末尾添加序号
-                    name_without_ext = os.path.splitext(new_filename)[0]
-                    new_filename = f"{name_without_ext}_{counter}{file_ext}"
-                    new_file_path = os.path.join(target_folder, new_filename)
-                    counter += 1
+                # 检查文件名是否已存在
+                if os.path.exists(new_file_path):
+                    print(f"跳过: '{os.path.basename(file_path)}' -> 目标文件已存在: '{new_filename}'")
+                    skipped_count += 1
+                    continue
 
                 action_desc = f"重命名并移动: '{os.path.basename(file_path)}' -> '{new_filename}'"
 
@@ -81,18 +103,13 @@ def batch_organize_files(source_folder, target_folder=None, prefix="file", start
                 original_filename = os.path.basename(file_path)
                 new_file_path = os.path.join(target_folder, original_filename)
 
-                # 检查文件名冲突
-                counter = 1
-                name, ext = os.path.splitext(original_filename)
-                while os.path.exists(new_file_path):
-                    new_filename = f"{name}_{counter}{ext}"
-                    new_file_path = os.path.join(target_folder, new_filename)
-                    counter += 1
+                # 检查文件名是否已存在
+                if os.path.exists(new_file_path):
+                    print(f"跳过: '{original_filename}' -> 目标文件已存在")
+                    skipped_count += 1
+                    continue
 
-                if counter > 1:
-                    action_desc = f"移动并避免冲突: '{original_filename}' -> '{os.path.basename(new_file_path)}'"
-                else:
-                    action_desc = f"移动: '{original_filename}'"
+                action_desc = f"移动: '{original_filename}'"
 
             # 移动文件
             shutil.move(file_path, new_file_path)
@@ -110,6 +127,9 @@ def batch_organize_files(source_folder, target_folder=None, prefix="file", start
     remove_empty_folders(source_folder)
 
     print(f"\n完成: 成功处理 {processed_count} 个文件")
+    print(f"跳过 {skipped_count} 个重复文件")
+    if delete_small_files:
+        print(f"删除 {deleted_count} 个小文件或非视频文件")
     return True
 
 
@@ -140,15 +160,21 @@ def main():
     start_num = 1  # 起始编号（重命名时使用）
     extension = None  # 指定扩展名，None表示所有文件
     rename_files = False  # 是否重命名文件
+    delete_small_files = True  # 是否删除小文件或非视频文件
+    min_size_gb = 1  # 最小文件大小(GB)
 
     print("开始批量整理文件...")
     print(f"源文件夹: {source_folder}")
     print(f"目标文件夹: {target_folder}")
     print(f"重命名模式: {'开启' if rename_files else '关闭'}")
+    print(f"删除小文件模式: {'开启' if delete_small_files else '关闭'}")
 
     if rename_files:
         print(f"编号起始: {start_num}")
         print(f"文件前缀: {prefix}")
+
+    if delete_small_files:
+        print(f"最小文件大小: {min_size_gb}GB")
 
     print(f"文件类型: {'所有文件' if extension is None else extension}")
     print("-" * 50)
@@ -160,7 +186,9 @@ def main():
         prefix=prefix,
         start_num=start_num,
         extension=extension,
-        rename_files=rename_files
+        rename_files=rename_files,
+        delete_small_files=delete_small_files,
+        min_size_gb=min_size_gb
     )
 
     if success:

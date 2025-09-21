@@ -1,6 +1,7 @@
 import os
 from moviepy.editor import *
 
+
 def wma_to_mp4_ffmpeg_direct(wma_file, image_file, output_mp4):
     """直接用 FFmpeg 合成（推荐）"""
     cmd = (
@@ -10,6 +11,7 @@ def wma_to_mp4_ffmpeg_direct(wma_file, image_file, output_mp4):
     )
     os.system(cmd)
     print(f"✅ 转换成功！输出文件：{output_mp4}")
+
 
 # 示例调用
 count = 1

@@ -1,19 +1,19 @@
 import os
-import pandas as pd
 import time
-import subprocess
-from urllib.parse import urlparse
-import pyautogui
+
+import pandas as pd
 import pyperclip
+
 import ImageMatcher.image_matcher as imgmatch
 
-def read_magnet_links_from_excel(file_path):
+
+def read_magnet_links_from_excel(file_path, sheet_name):
     """
     从Excel文件中读取磁力链接
     """
     try:
         # 读取Excel文件中的【单选】sheet
-        df = pd.read_excel(file_path, sheet_name='单选')
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
 
         # 获取B列的所有值
         magnet_links = df.iloc[:, 1].dropna().tolist()  # B列是第1列（0-based）
@@ -33,7 +33,7 @@ def open_quark_browser():
     """
     try:
         # 尝试打开夸克浏览器
-        #subprocess.Popen(['C:\\Users\\Galaxy\\AppData\\Local\\Programs\\Quark\\quark.exe','--new-window', 'https://pan.quark.cn/'])
+        # subprocess.Popen(['C:\\Users\\Galaxy\\AppData\\Local\\Programs\\Quark\\quark.exe','--new-window', 'https://pan.quark.cn/'])
         print("正在打开夸克浏览器...")
         time.sleep(5)  # 等待浏览器加载
     except Exception as e:
@@ -59,8 +59,6 @@ def add_magnet_to_quark(magnet_link):
             print("图像匹配操作失败")
             return False
 
-
-
         print(f"已添加磁力链接: {magnet_link[:50]}...")
         return True
     except Exception as e:
@@ -70,15 +68,15 @@ def add_magnet_to_quark(magnet_link):
 
 def main():
     # 指定Excel文件路径
-    #excel_file_path = input("请输入Excel文件路径: ").strip().strip('"')
+    # excel_file_path = input("请输入Excel文件路径: ").strip().strip('"')
     excel_file_path = 'Resource/BT.xlsx'
-
+    sheet_name = 'Sheet1'
     if not os.path.exists(excel_file_path):
         print("文件不存在，请检查路径是否正确")
         return
 
     # 读取磁力链接
-    magnet_links = read_magnet_links_from_excel(excel_file_path)
+    magnet_links = read_magnet_links_from_excel(excel_file_path, sheet_name)
 
     if not magnet_links:
         print("未找到有效的磁力链接")
@@ -102,7 +100,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # 安装所需库
-    # pip install pandas openpyxl pyautogui pyperclip
-
     main()

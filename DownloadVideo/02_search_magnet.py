@@ -1,12 +1,11 @@
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from openpyxl import load_workbook
 import re
+import time
+
+from openpyxl import load_workbook
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 
 
 def extract_magnet_links_from_excel():
@@ -59,7 +58,7 @@ def extract_magnet_links_from_excel():
 
         # 4. 设置Chrome浏览器选项
         chrome_options = Options()
-        #chrome_options.add_argument('--headless')  # 无头模式，不需要显示浏览器界面
+        # chrome_options.add_argument('--headless')  # 无头模式，不需要显示浏览器界面
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument(
