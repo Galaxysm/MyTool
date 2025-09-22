@@ -157,9 +157,9 @@ def extract_magnet_links_from_excel():
                 else:
                     print("在页面中没有找到magnet链接")
                     # 保存页面源代码以供调试
-                    with open(f"NoFind/debug_page_{row_num}.html", "w", encoding="utf-8") as f:
+                    with open(f"/NoFind/{url}", "w", encoding="utf-8") as f:
                         f.write(page_source)
-                    print(f"已保存页面源代码到debug_page_{row_num}.html以供调试")
+                    print(f"已保存页面源代码到{url}以供调试")
 
             except Exception as e:
                 print(f"处理URL {url} 时发生错误: {e}")
