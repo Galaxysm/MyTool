@@ -272,11 +272,11 @@ class MagnetLinkExtractor:
 
 def main():
     # 配置参数
-    target_url = "https://309r.0i284.net/forum-151-{}.html"
+    target_url = "https://309r.0i284.net/forum-103-{}.html"
     output_excel = "Resource/BT.xlsx"
     sheet_name = "Auto超链接"
     page = 1
-    max_pages = 78
+    max_pages = 1
 
     while page <= max_pages:
         print(f"\n{'=' * 50}")
