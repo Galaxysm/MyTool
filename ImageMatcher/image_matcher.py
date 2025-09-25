@@ -206,7 +206,7 @@ def main():
             print("请将template.png放置在以下位置之一:")
             for path in POSSIBLE_TEMPLATE_PATHS:
                 print(f"  - {path}")
-            return
+            return False
 
         print(f"使用模板图像: {template_path}")
 
@@ -228,11 +228,14 @@ def main():
             # 移动并点击
             move_and_click(x, y)
             print("操作完成!")
+            return True
         else:
             print(f"未找到匹配图像 (阈值: {MATCH_THRESHOLD})")
+            return False
 
     except Exception as e:
         print(f"发生错误: {e}")
+        return False
 
 
 def advanced_main():
