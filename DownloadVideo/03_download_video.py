@@ -152,11 +152,9 @@ def add_magnet_to_quark(magnet_link):
 
 def main():
     # 配置参数
-    # 指定Excel文件路径
-    # excel_file_path = input("请输入Excel文件路径: ").strip().strip('"')
+    sheet_name = '下载页'      # 自定义磁力链接 下载页
+
     excel_file_path = 'Resource/BT.xlsx'
-    # 自定义磁力链接 下载页
-    sheet_name = '下载页'
     if not os.path.exists(excel_file_path):
         print("文件不存在，请检查路径是否正确")
         return
