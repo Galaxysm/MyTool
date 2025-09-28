@@ -75,18 +75,22 @@ def generate_text_image(
 
 
 def main():
-    count = 1
-    while count <= 33:
-        formatted_count = str(count).zfill(2)
 
-        # 示例参数
+    # 参数设定
+    count = 1           # 起始index
+    max_count = 33      # 终止index
+    text = f"盗墓笔记8\n大结局上"
+    output_path = f"E:\douyin\img\\"
+
+    while count <= max_count:
+        formatted_count = str(count).zfill(2)
         params = {
-            "text": f"盗墓笔记8\n大结局上{formatted_count}",
+            "text": text + formatted_count,
             "font_path": r"1657940861632229.ttf",  # 替换为实际字体路径
             "font_size": 100,
             "bg_color": (0, 0, 0),
             "image_size": (1920, 1080),
-            "output_path": f"E:\douyin\img\\{formatted_count}.png"
+            "output_path": output_path + f"{formatted_count}.png"
         }
 
         # 调用生成函数
